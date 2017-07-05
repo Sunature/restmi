@@ -1,6 +1,7 @@
 package com.sunx.rmi.helper;
 
 import java.lang.reflect.Field;
+import java.security.NoSuchAlgorithmException;
 
 import com.sunx.rmi.service.RmiRequest;
 import com.sunx.util.external.MD5Util;
@@ -13,7 +14,8 @@ import com.sunx.util.external.SHAUtil;
  */
 public class SecuritHelper {
 
-	public static String generateSign(RmiRequest er, String sign) {
+	public static String generateSign(RmiRequest er, String sign)
+			throws NoSuchAlgorithmException {
 		Field[] fields = er.getClass().getDeclaredFields();
 		Field.setAccessible(fields, true);
 		int len = fields.length;
@@ -36,7 +38,7 @@ public class SecuritHelper {
 	}
 
 	public static String generateSign(String method, String params, String sign) {
-		String con = method.concat(params);
+		String con = method.concat(params == null ? "" : params);
 		con = MD5Util.md5Hex(con);
 		con += sign;
 		return MD5Util.md5Hex(con);

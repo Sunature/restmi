@@ -12,4 +12,9 @@ public class ServiceTest {
 		return a + b;
 	}
 
+	public static void main(String[] args){
+		ServiceTest st = new ServiceTest();
+		st.test("ddd", null);
+	}
+	
 }

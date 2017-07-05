@@ -12,7 +12,7 @@ public class ClientTest {
 		r.printApi();
 		RmiRequest req = new RmiRequest("ServiceTest.test");
 		req.addParam("a", "simplest");
-		req.addParam("b", "大道至简");
+		req.addParam("bgg", "大道至简");
 		RmiResponse<String> resp;
 		try {
 			resp = r.execute(req);

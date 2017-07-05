@@ -17,7 +17,7 @@ public interface RmiService {
 	public String printApi();
 
 	/**
-	 * just for .net
+	 * for .net or node ...
 	 * 
 	 * @param method
 	 * @param params

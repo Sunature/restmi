@@ -1,6 +1,7 @@
 package com.sunx.rmi.sdk;
 
 import java.net.MalformedURLException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -22,20 +23,37 @@ import com.sunx.util.log.LogUtil;
 public class RmiServer {
 
 	private RmiService service;
-
-	public RmiServer() {
-		this("/rmi.properties");
-	}
-
+	private static final int DEFAULT_TIME_OUT = 3000;
+	private static final String DEFAULT_PATH = "/rmi.properties";
 	private Properties prop;
 
+	public RmiServer() {
+		this(DEFAULT_PATH);
+	}
+
 	public RmiServer(String path) {
+		this(path, null, null);
+	}
+
+	public RmiServer(int connectTimeOut, int readTimeOut) {
+		this(DEFAULT_PATH, connectTimeOut, readTimeOut);
+	}
+
+	public RmiServer(String path, Integer connectTimeOut, Integer readTimeOut) {
 		path = path.startsWith("/") ? path : "/" + path;
 		prop = PropertyUtil.loadProperties(path);
 		HessianProxyFactory factory = new HessianProxyFactory();
 		factory.setChunkedPost(false);
-		factory.setConnectTimeout(3000);
-		factory.setReadTimeout(3000);
+		connectTimeOut = connectTimeOut == null ? StringUtil.isNumeric(prop
+				.getProperty(Constaints.CONNECT_TIME_OUT)) ? Integer
+				.parseInt(prop.getProperty(Constaints.CONNECT_TIME_OUT))
+				: DEFAULT_TIME_OUT : connectTimeOut;
+		readTimeOut = readTimeOut == null ? StringUtil.isNumeric(prop
+				.getProperty(Constaints.READ_TIME_OUT)) ? Integer.parseInt(prop
+				.getProperty(Constaints.READ_TIME_OUT)) : DEFAULT_TIME_OUT
+				: readTimeOut;
+		factory.setConnectTimeout(connectTimeOut);
+		factory.setReadTimeout(readTimeOut);
 		try {
 			String host = prop.getProperty(Constaints.HOST);
 			StringBuilder p = new StringBuilder("http://").append(host);
@@ -60,10 +78,14 @@ public class RmiServer {
 	}
 
 	public <T> RmiResponse<T> execute(RmiRequest req) throws RmiException {
-		return this.service.execute(
-				req,
-				SecuritHelper.generateSign(req,
-						prop.getProperty(Constaints.SIGN)));
+		try {
+			return this.service.execute(
+					req,
+					SecuritHelper.generateSign(req,
+							prop.getProperty(Constaints.SIGN)));
+		} catch (NoSuchAlgorithmException e) {
+			throw new RmiException(e);
+		}
 	}
 
 	public void printApi() {

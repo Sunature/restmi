@@ -11,10 +11,11 @@ public class AdaptorHelper implements Adaptor {
 		try {
 			if (mapper.getScope() == AdaptorScope.prototype)
 				return mapper.getAdaptor().newInstance();
-			obj = AdaptorContainer.ADAPTOR.get(mapper.getClass().getName());
+			obj = AdaptorContainer.ADAPTOR.get(mapper.getAdaptor().getName());
 			if (obj == null) {
 				obj = mapper.getAdaptor().newInstance();
-				AdaptorContainer.ADAPTOR.put(mapper.getClass().getName(), obj);
+				AdaptorContainer.ADAPTOR
+						.put(mapper.getAdaptor().getName(), obj);
 			}
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RmiException(e);
